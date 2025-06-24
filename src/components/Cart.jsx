@@ -6,29 +6,34 @@ import Button from './UI/Button.jsx';
 import UserProgressContext from '../store/UserProgressContext.jsx';
 
 export default function Cart() {
-    const cartContext = useContext(CartContext);
-const userProgressContext = useContext(UserProgressContext); 
-    const orderTotalCost = cartContext.items.reduce((totalCost, item) => {
-        return totalCost + item.price * item.quantity
+    const cartCxt = useContext(CartContext);
+    const userProgressCxt = useContext(UserProgressContext);
 
-    }, 0);
+    const cartTotalCost = cartCxt.items.reduce(
+        (totalCost, item) => totalCost + item.price * item.quantity,
+        0
+    );
+
+    function handleCloseCart() {
+        userProgressCxt.hideCart();
+    }
+
 
     return (
-        <Modal className="cart">
+        <Modal className="cart" open={userProgressCxt.progress === 'cart'}>
             <h2>Your Cart</h2>
             <ul>
-                {cartContext.items.map((item) => {
+                {cartCxt.items.map((item) => (
                     <li key={item.id}>
                         {item.name} - {item.quantity}
                     </li>
-                }
-                )}
+                ))}
 
             </ul>
-            <p className="cart-total">{currencyFormatter.format(orderTotalCost)} </p>
+            <p className="cart-total">{currencyFormatter.format(cartTotalCost)} </p>
             <p className='modal-actions'>
-                <Button textOnly>Close</Button>
-                <Button >Go to Checkout</Button>
+                <Button textOnly onClick={handleCloseCart}>Close</Button>
+                <Button onClick={handleCloseCart} >Go to Checkout</Button>
 
             </p>
         </Modal>
