@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { currencyFormatter } from '../util/formatting.js';
 import Button from './UI/Button.jsx';
 import UserProgressContext from '../store/UserProgressContext.jsx';
+import CartItem from './CartItem.jsx';
 
 export default function Cart() {
     const cartCxt = useContext(CartContext);
@@ -18,15 +19,25 @@ export default function Cart() {
         userProgressCxt.hideCart();
     }
 
+    
+
+
 
     return (
         <Modal className="cart" open={userProgressCxt.progress === 'cart'}>
             <h2>Your Cart</h2>
             <ul>
-                {cartCxt.items.map((item) => (
-                    <li key={item.id}>
-                        {item.name} - {item.quantity}
-                    </li>
+
+                {cartCxt.items.map((item) =>
+                (
+                    <CartItem
+                        key={item.id}
+                        name={item.name}
+                        quantity={item.quantity}
+                        price={item.price}
+                        onIncrease={() => cartCxt.addItem(item)}
+                        onDecrease={() => cartCxt.removeItem(item.id)}
+                    />
                 ))}
 
             </ul>
