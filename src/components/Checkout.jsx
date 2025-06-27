@@ -23,8 +23,8 @@ export default function Checkout() {
         data,
         isLoading: isSending,
         error,
-        sendRequest
-
+        sendRequest,
+        clearData
     } = useHttp('http://localhost:3000/orders', requestConfig);
 
 
@@ -35,6 +35,12 @@ export default function Checkout() {
 
     function handleClose() {
         userProgressCxt.hideCheckout();
+    }
+
+    function handleFinish() {
+        userProgressCxt.hideCheckout();
+        cartCxt.clearCart();
+        clearData();
     }
 
     function handleSubmit(event) {
@@ -50,19 +56,6 @@ export default function Checkout() {
                 },
             })
         );
-
-        //fetch('http://localhost:3000/orders', {
-        //    method: 'POST',
-        //    headers: {
-        //        'Content-Type': 'application/json'
-        //    },
-        //    body: JSON.stringify({
-        //        order: {
-        //            items: cartCxt.items,
-        //            customer: customerData
-        //        }
-        //    })
-        //});
     }
 
     let actions = (
@@ -71,8 +64,6 @@ export default function Checkout() {
                 Close
             </Button>
             <Button>Submit Order</Button>
-
-
         </>
     );
 
@@ -81,14 +72,21 @@ export default function Checkout() {
     }
 
     if (data && !error) {
-        return <Modal
-            open={userProgressCxt.progress === 'checkout'}
-            onClose={handleClose}
-        >
-            <h2>Success</h2>
-            <p>Your order was handled successfully</p>
-
-        </Modal>
+        return (
+            <Modal
+                open={userProgressCxt.progress === 'checkout'}
+                onClose={handleFinish}
+            >
+                <h2>Success</h2>
+                <p>Your order was submitted successfully</p>
+                <p>
+                    We will get back to you with more details via email in the next few minutes.
+                </p>
+                <p className="modal-actions">
+                    <Button onClick={handleFinish}>OK</Button>
+                </p>
+            </Modal>
+        );
     }
 
     return (
