@@ -1,6 +1,6 @@
 import Modal from "./UI/Modal.jsx";
 import CartContext from "../store/CartContext.jsx";
-import { useContext } from "react";
+import { useContext, useActionState } from "react";
 import { currencyFormatter } from "../util/formatting.js";
 import Input from './Input.jsx';
 import UserProgressContext from "../store/UserProgressContext.jsx";
@@ -21,7 +21,7 @@ export default function Checkout() {
 
     const {
         data,
-        isLoading: isSending,
+        //isLoading: isSending, -- not needed for formaction
         error,
         sendRequest,
         clearData
@@ -42,13 +42,12 @@ export default function Checkout() {
         cartCxt.clearCart();
         clearData();
     }
-
-    function handleSubmit(event) {
-        event.preventDefault();
-        const fd = new FormData(event.target);
+    
+    //prevState is a required field
+    async function checkoutAction(prevState, fd) {
         const customerData = Object.fromEntries(fd.entries());
 
-        sendRequest(
+        await sendRequest(
             JSON.stringify({
                 order: {
                     items: cartCxt.items,
@@ -57,6 +56,9 @@ export default function Checkout() {
             })
         );
     }
+
+    const [formState, formAction, isSending] = useActionState(checkoutAction, null);
+
 
     let actions = (
         <>
@@ -91,7 +93,7 @@ export default function Checkout() {
 
     return (
         <Modal open={userProgressCxt.progress === 'checkout'} onClose={handleClose}>
-            <form onSubmit={handleSubmit}>
+            <form action={formAction}>
                 <h2>Checkout</h2>
                 <p>Total Amount: {currencyFormatter.format(cartTotalCost)}</p>
                 <Input label="Full Name" type="text" id="name" />
